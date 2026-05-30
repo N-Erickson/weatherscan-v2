@@ -2623,6 +2623,7 @@ async function startPrograms() {
   
   initTravelForecast()
   await preloadRadars();//decides whether radars are unavailable
+  $("#mini-echoes").animate({opacity: 1}, 566)
 
   slideKickOff()
 

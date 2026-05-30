@@ -384,6 +384,8 @@ async function animateLocalRadar() {
     throw new Error("No radar layers available for animation.");
   }
 
+  clearInterval(locradarani);
+  clearInterval(locRadarAnimation);
   validLayers.forEach((layerId) => radarEchoes.setLayoutProperty(layerId, "visibility", "none"));
   let frameidx = 0;
   locradarani = setInterval(() => {
@@ -419,9 +421,11 @@ async function cleanupLocRadarLayers() {
 }
 
 async function startLocalRadar() {
-  await cleanupLocRadarLayers();
-  await getLocRadarTimestamps();
-  await addLocRadarLayers();
+  if (!locRadarTimestamps || locRadarTimestamps.length === 0) {
+    await cleanupLocRadarLayers();
+    await getLocRadarTimestamps();
+    await addLocRadarLayers();
+  }
   await animateLocalRadar();
 }
 async function stopLocalRadar() {
@@ -468,6 +472,8 @@ async function animateSatRadar() {
     throw new Error("No radar layers available for animation.");
   }
 
+  clearInterval(satradani);
+  clearInterval(satRadarAnimation);
   validLayers.forEach((layerId) => satEchoes.setLayoutProperty(layerId, "visibility", "none"));
   let frameidx = 0;
   satradani = setInterval(() => {
@@ -503,9 +509,11 @@ async function cleanupSatRadarLayers() {
 }
 
 async function startSatRadar() {
-  await cleanupSatRadarLayers();
-  await getSatRadarTimestamps();
-  await addSatRadarLayers();
+  if (!satRadarTimestamps || satRadarTimestamps.length === 0) {
+    await cleanupSatRadarLayers();
+    await getSatRadarTimestamps();
+    await addSatRadarLayers();
+  }
   await animateSatRadar();
 }
 async function stopSatRadar() {
@@ -559,15 +567,18 @@ async function animateMiniRadar() {
   validLayers.forEach((layerId) => miniEchoes.setLayoutProperty(layerId, "visibility", "none"));
   miniEchoes.setLayoutProperty(validLayers[0], "visibility", "visible");
   let frameidx = 0;
-  miniradarani = setInterval(() => {
-    miniEchoes.setLayoutProperty(validLayers[frameidx], "visibility", "none");
-    frameidx++;
-    miniEchoes.setLayoutProperty(validLayers[frameidx], "visibility", "visible");
-    miniEchoes.setLayoutProperty(validLayers[0], "visibility", "none");
-    if (frameidx == validLayers.length - 1) {
-      clearInterval(miniradarani);
-    }
-  }, 144)
+  await new Promise((resolve) => {
+    miniradarani = setInterval(() => {
+      miniEchoes.setLayoutProperty(validLayers[frameidx], "visibility", "none");
+      frameidx++;
+      miniEchoes.setLayoutProperty(validLayers[frameidx], "visibility", "visible");
+      miniEchoes.setLayoutProperty(validLayers[0], "visibility", "none");
+      if (frameidx == validLayers.length - 1) {
+        clearInterval(miniradarani);
+        resolve();
+      }
+    }, 144);
+  });
   // miniRadarAnimation = setInterval(() => {
   //   miniradarani = setInterval(() => {
   //     miniEchoes.setLayoutProperty(validLayers[frameidx], "visibility", "none");
@@ -594,20 +605,17 @@ async function cleanupMiniRadarLayers() {
 
 async function startMiniRadar(newSlide) {
   try {
-    if(newSlide){
+    if(newSlide && (!miniRadarTimestamps || miniRadarTimestamps.length === 0)){
       await cleanupMiniRadarLayers();
       await getMiniRadarTimestamps();
       await addMiniRadarLayers();
-      await animateMiniRadar();
-    }else{
-      await animateMiniRadar();
     }
+    await animateMiniRadar();
     lBarData.radarUnavailable = false
   } catch (error) {
     console.error(error)
     lBarData.radarUnavailable = true
   }
-  
 }
 async function stopMiniRadar() {
   var validLayers = miniRadarTimestamps.map((tss) => `radarlayer_${tss.ts}`);
@@ -617,8 +625,15 @@ async function stopMiniRadar() {
   validLayers.forEach((layerId) => miniEchoes.setLayoutProperty(layerId, "visibility", "none"));
 }
 
-//i would recommend stopping this 3 seconds before the sim starts
+//start radars once and let them run forever
 async function preloadRadars(){
+  // Position radar map at the configured location so preload caches the correct tiles
+  var radarConfig = systemSettings.mainCity.radar;
+  radarEchoes.jumpTo({center: [radarConfig.lon, radarConfig.lat]});
+  radarEchoes.setZoom(radarConfig.zoom);
+  radarEchoes.resize();
+  satEchoes.resize();
+
   try {
     await startLocalRadar();
   } catch (error) {
@@ -643,7 +658,16 @@ async function preloadRadars(){
     lBarData.radarUnavailable = true
   }
 
-  stopMiniRadar();
-  stopLocalRadar();
-  stopSatRadar();
+  // Refresh radar data every 5 minutes to keep timestamps current
+  setInterval(async function() {
+    await getLocRadarTimestamps();
+    await addLocRadarLayers();
+    await cleanupLocRadarLayers();
+    await getSatRadarTimestamps();
+    await addSatRadarLayers();
+    await cleanupSatRadarLayers();
+    await getMiniRadarTimestamps();
+    await addMiniRadarLayers();
+    await cleanupMiniRadarLayers();
+  }, 300000);
 }

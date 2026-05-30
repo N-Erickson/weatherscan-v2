@@ -507,6 +507,7 @@ img#mist-logo {
 }
 #mini-echoes {
   filter: drop-shadow(9px 6px 0 #141414);
+  opacity: 0;
 }
 .radar-lbar #miniradar-amenities-trans {
   position: absolute;
@@ -1922,19 +1923,15 @@ its not 1 for 1 code using so i mean i guess its aight
   width: 100%;
   height: 100%;
   z-index: 1 !important;
-  filter: drop-shadow(12px 8px 0 #141414);/*
+  filter: drop-shadow(12px 8px 0 #141414);
   opacity: 0;
-  transition: opacity 0.566s linear;*/
-  display: none;
 }
 #sat-echoes {
   position: absolute;
   width: 100%;
   height: 100%;
-  z-index: 0 !important;/*
+  z-index: 0 !important;
   opacity: 0;
-  transition: opacity 0.566s linear;*/
-  display: none;
 }
 #sat-amenities {
   position: absolute;

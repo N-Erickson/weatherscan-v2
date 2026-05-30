@@ -880,7 +880,7 @@ var slidePrograms = {
       if (locationChoice != "spanish") {
         audioPlayer.playDopplerRadar()
       }
-      fadeSlideIn($(".doppler-radar"), 0, 0)
+      $(".doppler-radar").css({opacity: 1, pointerEvents: ""})
       createRadarCities(locationChoice)
       createRadarIcons(locationChoice)
       $("#radar-basemap").fadeIn(0)
@@ -892,7 +892,6 @@ var slidePrograms = {
       $(".doppler-radar .icons-trans").fadeIn(566)
       $(".doppler-radar .radar-legend").fadeIn(566)
       setTimeout(() => {
-        fadeSlideOut($(".doppler-radar"), 0, true, 566)
         $("#radar-amenities").fadeOut(566)
         $("#radar-amenities-trans").fadeOut(566)
         $(".doppler-radar .cities").fadeOut(566)
@@ -901,24 +900,16 @@ var slidePrograms = {
         $(".doppler-radar .icons-trans").fadeOut(566)
         $(".doppler-radar .radar-legend").fadeOut(566)
         setTimeout(() => {
-          clearInterval(locRadarAnimation)
+          $(".doppler-radar").css({opacity: 0, pointerEvents: "none"})
           $("#radar-basemap").fadeOut(0)
           $("#slides-background").fadeIn(0)
-          setTimeout(stopLocalRadar,500)
+          round = 0; slideCallBack();
         }, 566);
       }, slideSettings.order[orderidx].slideLineup[gidx].slides[idx].duration-566);
-      try {
-        startLocalRadar();
-        $("#radar-echoes").fadeIn(566)
-        setTimeout(() => {
-          $("#radar-echoes").fadeOut(566)
-        }, slideSettings.order[orderidx].slideLineup[gidx].slides[idx].duration-566);
-      } catch (error) {
-        $(".tempunavailable").fadeIn(566)
-        setTimeout(() => {
-          $(".tempunavailable").fadeOut(566)
-        }, slideSettings.order[orderidx].slideLineup[gidx].slides[idx].duration-566);
-      }
+      $("#radar-echoes").animate({opacity: 1}, 566)
+      setTimeout(() => {
+        $("#radar-echoes").animate({opacity: 0}, 566)
+      }, slideSettings.order[orderidx].slideLineup[gidx].slides[idx].duration-566);
      setTimeout(() => {
         //$(".doppler-radar .radar-shrink").attr("style","")
         deleteRadarCities()
@@ -969,33 +960,24 @@ var slidePrograms = {
         }
         
       }, 50);
-      fadeSlideIn($(".doppler-radar"), 0, 0)
+      $(".doppler-radar").css({opacity: 1, pointerEvents: ""})
       $("#sat-basemap").fadeIn(566)
       $("#sat-amenities").fadeIn(566)
       $(".doppler-radar .radar-legend").fadeIn(566)
       setTimeout(() => {
-        fadeSlideOut($(".doppler-radar"), 0, true, 566)
         $(".doppler-radar .radar-legend").fadeOut(566)
         $("#sat-amenities").fadeOut(566)
         setTimeout(() => {
+          $(".doppler-radar").css({opacity: 0, pointerEvents: "none"})
           $("#slides-background").fadeIn(0)
-          clearInterval(satRadarAnimation)
-          setTimeout(stopSatRadar,500)
+          round = 0; slideCallBack();
         }, 566);
       }, slideSettings.order[orderidx].slideLineup[gidx].slides[idx].duration-566);
-      try {
-        startSatRadar();
-        $("#sat-echoes").fadeIn(566)
-        setTimeout(() => {
-          $("#sat-echoes").fadeOut(566)
-          $("#sat-basemap").fadeOut(566)
-        }, slideSettings.order[orderidx].slideLineup[gidx].slides[idx].duration-566);
-      } catch (error) {
-        $(".tempunavailable").fadeIn(566)
-        setTimeout(() => {
-          $(".tempunavailable").fadeOut(566)
-        }, slideSettings.order[orderidx].slideLineup[gidx].slides[idx].duration-566);
-      }
+      $("#sat-echoes").animate({opacity: 1}, 566)
+      setTimeout(() => {
+        $("#sat-echoes").animate({opacity: 0}, 566)
+        $("#sat-basemap").fadeOut(566)
+      }, slideSettings.order[orderidx].slideLineup[gidx].slides[idx].duration-566);
       if (weatherData.satUnavailable == false) {
         
       } else {
