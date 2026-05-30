@@ -555,10 +555,8 @@ async function addMiniRadarLayers() {
   }
 }
 async function animateMiniRadar() {
-  if(miniradarani != undefined && miniRadarAnimation != undefined){
-    clearInterval(miniradarani);
-    clearInterval(miniRadarAnimation);
-  }
+  clearInterval(miniradarani);
+  clearInterval(miniRadarAnimation);
   var validLayers = miniRadarTimestamps.map((tss) => `radarlayer_${tss.ts}`);
   if (validLayers.length === 0) {
     throw new Error("No radar layers available for animation.");
@@ -632,6 +630,7 @@ async function preloadRadars(){
   radarEchoes.jumpTo({center: [radarConfig.lon, radarConfig.lat]});
   radarEchoes.setZoom(radarConfig.zoom);
   radarEchoes.resize();
+  satEchoes.jumpTo({center: [radarConfig.lon, radarConfig.lat]});
   satEchoes.resize();
 
   try {
