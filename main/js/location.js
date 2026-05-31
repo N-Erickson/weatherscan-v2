@@ -180,7 +180,7 @@ async function getMainCity() {
 
         var icId = 0
         for (var i = 0; i < icaoData.location.stationId.length; i++) {
-            if (icaoData.location.stationId[i].length > 4) {icID++} else {
+            if (icaoData.location.stationId[i].length > 4) {icId++} else {
                 break
             }
         }
