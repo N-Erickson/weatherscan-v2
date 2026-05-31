@@ -435,12 +435,12 @@ async function getCoreData() {
     weatherData.alerts.mainLoc = {locationname:systemSettings.mainCity.locationName,warnings:[], pages:0,alertsAmount:0}
   }
 }
-  getBulletinAlerts()
+  getBulletinAlerts().catch(function(e){ console.error(e) })
   async function getCurrent() {
     var url = "https://api.weather.com/v3/wx/observations/current?icaoCode=" + systemSettings.mainCity.icaoCode + "&units=e&language=en-US&format=json&apiKey=" + api_key
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       weatherData.currentConditions.english.mainLoc.locationName = systemSettings.mainCity.obsName
       weatherData.currentConditions.english.mainLoc.noReport = false
       weatherData.currentConditions.english.mainLoc.humidity = data.relativeHumidity + "%"
@@ -465,15 +465,14 @@ async function getCoreData() {
       weatherData.almanac.sunset = ""
     }
   }
-  getCurrent()
+  getCurrent().catch(function(e){ console.error(e) })
   async function getNearby(num) {
     var url = "https://api.weather.com/v3/wx/observations/current?icaoCode=" + systemSettings.nearbyCities.cities[num].icaoCode + "&units=e&language=en-US&format=json&apiKey=" + api_key
-    
-    const data = await $.getJSON(url)
 
     var obj = {noReport:true,locationName:systemSettings.nearbyCities.cities[num].obsName,icon:"",temperature:"",wind:""}
 
     try {
+      const data = await $.getJSON(url)
       obj.noReport = false
       obj.locationName = systemSettings.nearbyCities.cities[num].obsName
       obj.icon = data.iconCodeExtend
@@ -498,10 +497,9 @@ async function getCoreData() {
 
   async function getLF() {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.mainCity.lat + "," + systemSettings.mainCity.lon + "&format=json&units=e&language=en-US&apiKey=" + api_key
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var ii = 0
       var ni = 1
       if (data.daypart[0].daypartName[0] == null) {
@@ -538,9 +536,9 @@ async function getCoreData() {
   async function getDayPart() {
     var url = "https://api.weather.com/v3/wx/forecast/hourly/2day?geocode=" + systemSettings.mainCity.lat + "," + systemSettings.mainCity.lon + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var currenthr = dateFns.getHours(new Date());
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var targetHours
       function timeTitleCreate(time){
         var hour = dateFns.getHours(time);
@@ -615,14 +613,13 @@ async function getCoreData() {
       weatherData.dayPart.english.mainLoc.noReport = true
     }
   }
-  getDayPart()
+  getDayPart().catch(function(e){ console.error(e) })
   async function getExtended() {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.mainCity.lat + "," + systemSettings.mainCity.lon + "&format=json&units=e&language=en-US&apiKey=" + api_key
-    
-    const data = await $.getJSON(url)
 
     try {
-      var today = longWeekDays[new Date().getDay()] 
+      const data = await $.getJSON(url)
+      var today = longWeekDays[new Date().getDay()]
       weatherData.extendedForecast.english.mainLoc.locationName = systemSettings.mainCity.locationName
       weatherData.extendedForecast.english.mainLoc.noReport = false
       var ii = 0
@@ -652,10 +649,9 @@ async function getCoreData() {
   getExtended()
   async function getAlmanac() {
     var url = "https://api.weather.com/v3/wx/almanac/daily/5day?icaoCode=" + systemSettings.mainCity.icaoCode + `&format=json&units=e&startDay=${dateFns.format(new Date(),"d")}&startMonth=${dateFns.format(new Date(),"M")}&apiKey=` + api_key
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       weatherData.almanac.locationName = systemSettings.mainCity.almanacLocationName
       weatherData.almanac.noReport = false
       weatherData.almanac.day = dateFns.format(new Date(),"MMMM d")
@@ -677,10 +673,9 @@ async function getCoreData() {
   async function getMoons() {
         var ii = 0
         var firstURL = `https://www.icalendar37.net/lunar/api/?lang=en&month=${dateFns.format(new Date(),"M")}&year=${dateFns.format(new Date(),"yyyy")}`
-        
-        const firstData = await $.getJSON(firstURL)
 
         try {
+          const firstData = await $.getJSON(firstURL)
           weatherData.almanac.locationName = systemSettings.mainCity.almanacLocationName
 
           for (phase in firstData.phase) {
@@ -701,9 +696,9 @@ async function getCoreData() {
 
         if (weatherData.almanac.moonphases[3].date == "") {
           var secondURL = `https://www.icalendar37.net/lunar/api/?lang=en&month=${dateFns.format((dateFns.addMonths(new Date(),1)),"M")}&year=${dateFns.format(dateFns.addMonths(new Date(),1),"yyyy")}`
-          const secondData = await $.getJSON(secondURL)
 
           try {
+            const secondData = await $.getJSON(secondURL)
             weatherData.almanac.locationName = systemSettings.mainCity.almanacLocationName
 
             for (phase in secondData.phase) {
@@ -730,10 +725,9 @@ function getExtraCore(locNum) {
   var url = "https://api.weather.com/v3/alerts/headlines?geocode=" + systemSettings.extraCity.cities[locNum].lat + "," + systemSettings.extraCity.cities[locNum].lon + "&format=json&language=en-US&apiKey=" + api_key;
   weatherData.airQuality.ozoneAction = false
   weatherData.frostFreezeWarning = false
-    
-  const data = await $.getJSON(url);
 
   try {
+    const data = await $.getJSON(url);
     
 
     weatherData.alerts.extraLoc[locNum] = {
@@ -793,14 +787,13 @@ function getExtraCore(locNum) {
     weatherData.alerts.extraLoc[locNum].alertsAmount = 0
   }
 }
-  getBulletinAlerts()
+  getBulletinAlerts().catch(function(e){ console.error(e) })
   async function getCurrent() {
     var url = "https://api.weather.com/v3/wx/observations/current?icaoCode=" + systemSettings.extraCity.cities[locNum].icaoCode + "&units=e&language=en-US&format=json&apiKey=" + api_key
     var eLocData = {noReport:true,locationName:"",humidity:"",dewPoint:"",pressure:"",pressureTrend:"",wind:"",gusts:"",feelsLike:"",feelsLikeTitle:"",icon:"",condition:"",temperature:"",}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       eLocData.locationName = systemSettings.extraCity.cities[locNum].obsName
       eLocData.noReport = false
       eLocData.humidity = data.relativeHumidity + "%"
@@ -822,15 +815,14 @@ function getExtraCore(locNum) {
     }
     weatherData.currentConditions.english.extraLoc[locNum] = eLocData
   }
-  getCurrent()
+  getCurrent().catch(function(e){ console.error(e) })
   async function getLF(){
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.extraCity.cities[locNum].lat + "," + systemSettings.extraCity.cities[locNum].lon + "&format=json&units=e&language=en-US&apiKey=" + api_key
-    
+
     var eLocLF = {noReport:true,locationName:"",times:[{timetitle:"",forecast:""},{timetitle:"",forecast:""},{timetitle:"",forecast:""},{timetitle:"",forecast:""}]}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var ii = 0
       var ni = 1
       if (data.daypart[0].daypartName[0] == null) {
@@ -865,16 +857,15 @@ function getExtraCore(locNum) {
     
     weatherData.localForecast.extraLoc[locNum] = eLocLF;
   }
-  getLF()
+  getLF().catch(function(e){ console.error(e) })
 
   async function getDayPart() {
     var url = "https://api.weather.com/v3/wx/forecast/hourly/2day?geocode=" + systemSettings.extraCity.cities[locNum].lat + "," + systemSettings.extraCity.cities[locNum].lon + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var elocData = {noReport: true,locationName:"",header:"",times: [{time:"", icon:"",condition:"",temperature:"",wind:""},{time:"", icon:"",condition:"",temperature:"",wind:""},{time:"", icon:"",condition:"",temperature:"",wind:""},{time:"", icon:"",condition:"",temperature:"",wind:""},]}
     var currenthr = dateFns.getHours(new Date());
 
-    const data = await $.getJSON(url)
-
     try {
+      const data = await $.getJSON(url)
       var targetHours
       function timeTitleCreate(time){
         var hour = dateFns.getHours(time);
@@ -951,14 +942,13 @@ function getExtraCore(locNum) {
 
     weatherData.dayPart.english.extraLoc[locNum] = elocData
   }
-  getDayPart()
+  getDayPart().catch(function(e){ console.error(e) })
   async function getExtended() {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.extraCity.cities[locNum].lat + "," + systemSettings.extraCity.cities[locNum].lon + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var eLocData = {noReport: true,locationName:"",days:[{day:"",icon:"",condition:"",high:"",low:""},{day:"",icon:"",condition:"",high:"",low:""},{day:"",icon:"",condition:"",high:"",low:""},{day:"",icon:"",condition:"",high:"",low:""},{day:"",icon:"",condition:"",high:"",low:""},]}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var today = longWeekDays[new Date().getDay()] 
       eLocData.locationName = systemSettings.extraCity.cities[locNum].locationName
       eLocData.noReport = false
@@ -987,14 +977,14 @@ function getExtraCore(locNum) {
     }
     weatherData.extendedForecast.english.extraLoc[locNum] = eLocData
   }
-  getExtended()
+  getExtended().catch(function(e){ console.error(e) })
 }
 function getSpanishData() {
   async function getCurrent() {
     var url = "https://api.weather.com/v3/wx/observations/current?icaoCode=" + systemSettings.mainCity.icaoCode + "&units=e&language=es-US&format=json&apiKey=" + api_key
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       weatherData.currentConditions.spanish.locationName = systemSettings.mainCity.obsName
       weatherData.currentConditions.spanish.noReport = false
       weatherData.currentConditions.spanish.humidity = data.relativeHumidity + "%"
@@ -1015,14 +1005,14 @@ function getSpanishData() {
       weatherData.currentConditions.spanish.noReport = true
     }
   }
-  getCurrent()
-  
+  getCurrent().catch(function(e){ console.error(e) })
+
   async function getDayPart() {
     var url = "https://api.weather.com/v3/wx/forecast/hourly/2day?geocode=" + systemSettings.mainCity.lat + "," + systemSettings.mainCity.lon + "&format=json&units=e&language=es-US&apiKey=" + api_key
     var currenthr = dateFns.getHours(new Date());
-    const data = await $.getJSON(url);
-    
+
     try {
+      const data = await $.getJSON(url);
       var targetHours
       function timeTitleCreate(time){
         var hour = dateFns.getHours(time);
@@ -1097,14 +1087,13 @@ function getSpanishData() {
       weatherData.dayPart.spanish.noReport = true
     }
   }
-  getDayPart()
+  getDayPart().catch(function(e){ console.error(e) })
   async function getExtended() {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.mainCity.lat + "," + systemSettings.mainCity.lon + "&format=json&units=e&language=es-US&apiKey=" + api_key
-    
-    const data = await $.getJSON(url);
-    
+
     try {
-      var today = longWeekDays[new Date().getDay()] 
+      const data = await $.getJSON(url);
+      var today = longWeekDays[new Date().getDay()]
       weatherData.extendedForecast.spanish.locationName = systemSettings.mainCity.locationName
       weatherData.extendedForecast.spanish.noReport = false
       var ii = 0
@@ -1131,15 +1120,14 @@ function getSpanishData() {
       weatherData.extendedForecast.spanish.noReport = true
     }
   }
-  getExtended()
+  getExtended().catch(function(e){ console.error(e) })
 }
 async function getTrafficData() {
   async function getTrafficReport() {
     var trafurl = "https://data.traffic.hereapi.com/v7/incidents?in=circle:" + systemSettings.traffic.lat + "," + systemSettings.traffic.lon + ";r=4000&locationReferencing=tmc&lang=en-US&type=construction,accident&apiKey=" + traf_key
-    
-    const data = await $.getJSON(trafurl)
 
     try {
+      const data = await $.getJSON(trafurl)
       var spacer = {"LOW IMPACT":"                     ", "MEDIUM IMPACT":"                            ", "HIGH IMPACT":"                      "}
       weatherData.trafficReport.incidents = []
       weatherData.trafficReport.noReport = false
@@ -1175,12 +1163,11 @@ async function getTrafficData() {
 
   async function getTrafficFlow(routenum) {
     var url = "https://router.hereapi.com/v8/routes?transportMode=car&origin=" + systemSettings.traffic.routes[routenum].from + "&destination=" + systemSettings.traffic.routes[routenum].to + "&return=summary,travelSummary,polyline&apiKey=" + traf_key
-    
-    const data = await $.getJSON(url)
 
     var flowObj = {routeIcon:"",from:"",to:"",speed:"",baseSpeed:"",travelTime:"",color:"",mph:""}
 
     try {
+      const data = await $.getJSON(url)
       weatherData.trafficFlow.locationName = systemSettings.traffic.locationName
       weatherData.trafficFlow.noReport = false
       
@@ -1217,9 +1204,8 @@ async function getTravelData() {
       {noReport:true,locationName:"",temperature:"",icon:""},
     ]}
 
-    const data = await $.getJSON(url);
-
     try {
+      const data = await $.getJSON(url);
       var validTime = data.validTimeLocal[0]
       //console.log(validTime)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
@@ -1256,9 +1242,8 @@ async function getTravelData() {
     weatherData.destinationForecast.cities = [];
     weatherData.destinationForecast.dayName = ["null","null","null"];
 
-    const data = await $.getJSON(url)
-
     try {
+      const data = await $.getJSON(url)
       data.forEach((ajaxedLoc, i) => {
         var today = longWeekDays[new Date().getDay()]
         var hourOffset = false;
@@ -1304,11 +1289,10 @@ async function getTravelData() {
 function getHealthData() {
   async function getOdActivityData() {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.health.lat + "," + systemSettings.health.lon + "&format=json&units=e&language=en-US&apiKey=" + api_key
-    
-    const data = await $.getJSON(url)
-    
+
     try {
-      var today = longWeekDays[new Date().getDay()] 
+      const data = await $.getJSON(url)
+      var today = longWeekDays[new Date().getDay()]
       var ii = 0
       var dpi = 0
       if (data.daypart[0].daypartName[0] == null) {
@@ -1337,10 +1321,9 @@ function getHealthData() {
   getOdActivityData()
   async function getPollenData() {
     var url = "https://api.weather.com/v1/geocode/" + systemSettings.health.lat + "/" + systemSettings.health.lon + "/observations/pollen.json?language=en-US&apiKey=" + api_key
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       if (data.pollenobservations !== undefined) {
         if (data.pollenobservations[0].stn_cmnt_cd != "A" && data.pollenobservations[0].stn_cmnt_cd != "B" && data.pollenobservations[0].stn_cmnt_cd != "C" && data.pollenobservations[0].stn_cmnt_cd != "D") {
           weatherData.pollen.noReport = false
@@ -1372,9 +1355,8 @@ function getHealthData() {
   async function getAchesPains() {
     var achesurl = "https://api.weather.com/v2/indices/achePain/daypart/3day?geocode=" + systemSettings.health.lat + "," + systemSettings.health.lon + "&language=en-US&format=json&apiKey=" + api_key
 
-    const achesdata = await $.getJSON(achesurl)
-
     try {
+      const achesdata = await $.getJSON(achesurl)
       var ii = 0
       if (achesdata.achesPainsIndex12hour.dayInd[0] == "N") {
         ii = 1
@@ -1392,9 +1374,8 @@ function getHealthData() {
 
     var breathurl = "https://api.weather.com/v2/indices/breathing/daypart/3day?geocode=" + systemSettings.health.lat + "," + systemSettings.health.lon + "&language=en-US&format=json&apiKey=" + api_key
 
-    const breathdata = await $.getJSON(breathurl)
-
     try {
+      const breathdata = await $.getJSON(breathurl)
       var ii = 0
       if (breathdata.breathingIndex12hour.dayInd[0] == "N") {
         ii = 1
@@ -1412,10 +1393,9 @@ function getHealthData() {
   getAchesPains()
   async function getAirQuality() {
     var url = "https://api.weather.com/v3/wx/globalAirQuality?geocode=" + systemSettings.health.lat + "," + systemSettings.health.lon + "&language=en-US&scale=EPA&format=json&apiKey=" + api_key
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       weatherData.airQuality.noReport = false
       weatherData.airQuality.locationName = systemSettings.health.locationName
       weatherData.airQuality.dayName = dateFns.format(new Date(data.globalairquality.expireTimeGmt * 1000), "eeee")
@@ -1432,9 +1412,8 @@ function getHealthData() {
   async function getUVData() {
     var currenturl = "https://api.weather.com/v3/wx/observations/current?icaoCode=" + systemSettings.health.icaoCode + "&units=e&language=en-US&format=json&apiKey=" + api_key
 
-    const currentdata = await $.getJSON(currenturl)
-
     try {
+      const currentdata = await $.getJSON(currenturl)
       if (currentdata.uvIndex >= 0) {
         weatherData.uvIndex.locationName = systemSettings.health.locationName
         weatherData.uvIndex.current.noReport = false
@@ -1452,9 +1431,8 @@ function getHealthData() {
     var forecasturl = "https://api.weather.com/v2/indices/uv/hourly/48hour?geocode=" + systemSettings.health.lat + "," + systemSettings.health.lon + "&language=en-US&format=json&apiKey=" + api_key
     var currenthr = dateFns.getHours(new Date())
 
-    const forecastdata = await $.getJSON(forecasturl)
-
     try {
+      const forecastdata = await $.getJSON(forecasturl)
       function timeTitleCreate(time){
         return (dateFns.format(time,'h a')).replace(" ", "").toLowerCase();
       }
@@ -1509,9 +1487,8 @@ async function getAirporData() {
 
     var url = "/airports"
 
-    const eventdata = await $.getJSON(url)
-
     try {
+      const eventdata = await $.getJSON(url)
       for (const airportevent of eventdata) {
         var delay = {iataCode:"", arrivalDelay:0, arrivalDelayReason:"", departureDelay:0, departureDelayReason:"",closed:false}
         delay.iataCode = airportevent.airportId
@@ -1588,10 +1565,9 @@ async function getAirporData() {
   grabAirportDelays()
   async function getLocalAirports(num) {
     var url = "https://api.weather.com/v3/wx/observations/current?iataCode=" + systemSettings.airport.main[num].iataCode + "&units=e&language=en-US&format=json&apiKey=" + api_key
-    
-    const data = await $.getJSON(url)
-    
+
     try {
+      const data = await $.getJSON(url)
       var airportObj = {noReport:true,iataCode:"",airportName:"",arrivalDelay:"",arrivalDelayReason:"",departureDelay:"",departureDelayReason:"",icon:"",condition:"",temperature:""}
       airportObj.noReport = false
       airportObj.airportName = systemSettings.airport.main[num].airportName
@@ -1630,9 +1606,8 @@ async function getAirporData() {
   async function getNatAirports(num) {
     var url = "https://api.weather.com/v3/wx/observations/current?iataCode=" + systemSettings.airport.national[num].iataCode + "&units=e&language=en-US&format=json&apiKey=" + api_key
 
-    const data = await $.getJSON(url)
-
     try {
+      const data = await $.getJSON(url)
       var airportObj = {noReport:true,iataCode:"",airportName:"",delay:"",delayReason:"",icon:"",temperature:""}
       airportObj.noReport = false
       airportObj.airportName = systemSettings.airport.national[num].airportName
@@ -1668,10 +1643,9 @@ async function getIntlData() {
   async function getIntlMapDataCA(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.canada[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 15 && hourOffset > 4 ? 0 : 1;
@@ -1704,10 +1678,9 @@ async function getIntlData() {
   async function getIntlMapDataMX(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.mexico[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -1740,10 +1713,9 @@ async function getIntlData() {
   async function getIntlMapDataCB(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.caribbean[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -1776,10 +1748,9 @@ async function getIntlData() {
   async function getIntlMapDataSA(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.southamerica[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -1812,10 +1783,9 @@ async function getIntlData() {
   async function getIntlMapDataGB(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.britain[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -1848,10 +1818,9 @@ async function getIntlData() {
   async function getIntlMapDataEU(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.europe[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -1883,10 +1852,9 @@ async function getIntlData() {
   async function getIntlMapDataAF(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.africa[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -1919,10 +1887,9 @@ async function getIntlData() {
   async function getIntlMapDataIN(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.india[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
-    
+
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -1955,10 +1922,9 @@ async function getIntlData() {
   async function getIntlMapDataEA(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.eastasia[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
-    
+
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -1991,10 +1957,9 @@ async function getIntlData() {
   async function getIntlMapDataOC(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.oceania[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -2027,10 +1992,9 @@ async function getIntlData() {
   async function getIntlMapDataAU(citynum) {
     var url = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.international.map.australia[citynum].header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var imObj = {noReport:true,locationName:"",temperature:"",icon:"", dayName:""}
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var hourOffset = getHourAtOffset(Number.parseInt(data.validTimeLocal[0].slice(-5, -2))) //(new Date(data.validTimeLocal[0]).getTimezoneOffset()/60)*100
       //if it is between 16:00 and 4:00 in the time zone of location
       var ii = hourOffset < 16 && hourOffset > 4 ? 0 : 1;
@@ -2069,9 +2033,8 @@ async function getIntlData() {
 
     weatherData.internationalForecast.cities = []
 
-    const data = await $.getJSON(url)
-
     try {
+      const data = await $.getJSON(url)
       data.forEach((ajaxedLoc, i) => {
         var ii = 1;
         var dpi = 2;
@@ -2121,10 +2084,9 @@ async function getGolfData() {
   async function getTeeTimeData() {
     var url = "https://api.weather.com/v3/wx/forecast/hourly/2day?geocode=" + systemSettings.golf.teeTime.header + "&format=json&units=e&language=en-US&apiKey=" + api_key
     var currenthr = dateFns.getHours(new Date());
-    
-    const data = await $.getJSON(url)
 
     try {
+      const data = await $.getJSON(url)
       var targetHours
       function timeTitleCreate(time){
         var hour = dateFns.getHours(time);
@@ -2186,9 +2148,8 @@ async function getGolfData() {
     var today = longWeekDays[new Date().getDay()] 
     var golfObj = {noReport: true, locationName:"", days:[{day:"",icon:"",high:"",low:"",wind:"", index:"", indexName:""},{day:"",icon:"",high:"",low:"",wind:"", index:"", indexName:""},{day:"",icon:"",high:"",low:"",wind:"", index:"", indexName:""}]}
     
-    const Fdata = await $.getJSON(Furl)
-
     try {
+      const Fdata = await $.getJSON(Furl)
       golfObj.noReport = false
       golfObj.locationName = systemSettings.golf.courses[coursenum].courseName
       var ii = 0
@@ -2216,10 +2177,9 @@ async function getGolfData() {
     }
 
     var Iurl = "https://api.weather.com/v2/indices/golf/daypart/15day?geocode=" + systemSettings.golf.courses[coursenum].header + "&language=en-US&format=json&apiKey=" + api_key
-    
-    const Idata = await $.getJSON(Iurl)
 
     try {
+      const Idata = await $.getJSON(Iurl)
       var dpi = 0
       if (Idata.golfIndex12hour.dayInd[0] == "N") {
         dpi = 1
@@ -2249,10 +2209,9 @@ function getGardenData() {
   async function getGardeningInfo() {
     var Furl = "https://api.weather.com/v3/wx/forecast/daily/5day?geocode=" + systemSettings.garden.header + "&format=json&units=e&language=en-US&apiKey=" + api_key
 
-    const Fdata = await $.getJSON(Furl)
-    
     try {
-      var today = longWeekDays[new Date().getDay()] 
+      const Fdata = await $.getJSON(Furl)
+      var today = longWeekDays[new Date().getDay()]
       var ii = 0
       var dpi = 0
       if (Fdata.daypart[0].daypartName[0] == null) {
@@ -2276,10 +2235,9 @@ function getGardenData() {
     }
     
     var Wurl = "https://api.weather.com/v2/indices/wateringNeeds/daypart/5day?geocode=" + systemSettings.garden.header + "&language=en-US&format=json&apiKey=" + api_key
-    
-    const Wdata = await $.getJSON(Wurl)
 
     try {
+      const Wdata = await $.getJSON(Wurl)
       var widxWords = ["Low", "Low", "Low", "Low", "Moderate", "Moderate", "Moderate", "Moderate", "High", "High", "High"]//0 and 1 are all the way to left, 10 is all the way to right
       var dpi = 0
       if (Wdata.wateringNeedsIndex12hour.dayInd[0] == "N") {
@@ -2300,9 +2258,8 @@ async function getSkiData() {
   async function getSkiReport(resortnum) {
     var url = "https://feeds.snocountry.net/getSnowReport.php?apiKey=SnoCountry.example&ids=" + systemSettings.ski.resorts[resortnum].resortId
 
-    const data = await $.getJSON(url)
-
     try {
+      const data = await $.getJSON(url)
       var skiObj = {resortName:"", newSnow:"", baseSnowMin:"", baseSnowMax:"", surface:"", openPercent:"", timeReported:"", timeStamp:""}
       skiObj.resortName = systemSettings.ski.resorts[resortnum].displayName + ", " + systemSettings.ski.resorts[resortnum].state
       skiObj.newSnow = data.items[0].newSnowMin == "" ? "0\"" : data.items[0].newSnowMin + "\""
@@ -2488,9 +2445,8 @@ function getBeachData() {
   async function getTides(station) {
     var Turl = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?begin_date=" + dateFns.format(new Date(),"yyyy") + dateFns.format(new Date(),"MM") + dateFns.format(new Date(),"dd") + "&end_date=" + dateFns.format((dateFns.addDays(new Date(), 4)),"yyyy") + dateFns.format((dateFns.addDays(new Date(), 4)),"MM") + dateFns.format((dateFns.addDays(new Date(), 4)),"dd") + "&station=" + systemSettings.beach.tides.stations[station].id + "&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&application=DataAPI_Sample&format=json"
     
-    const Tdata = await $.getJSON(Turl);
-
     try {
+      const Tdata = await $.getJSON(Turl);
       var cdate = new Date()
       weatherData.tides.stations[station].noReport = false
       weatherData.tides.stations[station].stationName = systemSettings.beach.tides.stations[station].name
@@ -2534,9 +2490,8 @@ function getBeachData() {
   async function getSunInfo() {
     var Surl = "https://api.weather.com/v3/wx/forecast/daily/5day?icaoCode=" + systemSettings.beach.tides.almanac.icaoCode + "&units=e&language=en-US&format=json&apiKey=" + api_key
 
-    const Sdata = await $.getJSON(Surl);
-
     try {
+      const Sdata = await $.getJSON(Surl);
       var cdate = new Date()
       weatherData.tides.almanacName = systemSettings.beach.tides.almanac.obsName
       var srid = 0

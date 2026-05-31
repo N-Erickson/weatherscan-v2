@@ -457,7 +457,7 @@ async function getAirports(lat, lon) {
             systemSettings.airport.main[airportCount].airportName = data.location.airportName[i];
             systemSettings.airport.main[airportCount].iataCode = data.location.iataCode[i];
             airportCount++;
-        } else if (data.location.airportName[i].includes("International") || data.location.airportName[i].includes("Intl")){
+        } else if ((data.location.airportName[i].includes("International") || data.location.airportName[i].includes("Intl")) && systemSettings.airport.main.length > 1){
             systemSettings.airport.main[1].airportName = data.location.airportName[i];
             systemSettings.airport.main[1].iataCode = data.location.iataCode[i];
         }

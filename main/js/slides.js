@@ -610,10 +610,48 @@ var slidePrograms = {
       //console.log("next segment", slideSettings.order[orderidx].slideLineup[ngidx].group)
       if (systemSettings.extraCity.cities.length > 1) {
         locationid++
+        // Reposition mini radar and update sidebar to the new city
+        var nextLocId = locationid >= systemSettings.extraCity.cities.length ? 0 : locationid;
+        var miniRadarConfig = systemSettings.extraCity.cities[nextLocId].radar;
+        if (miniRadarConfig && miniRadarConfig.lat != "" && miniRadarConfig.lon != "") {
+          miniradar.jumpTo({center: [miniRadarConfig.lon, miniRadarConfig.lat]});
+          miniEchoes.jumpTo({center: [miniRadarConfig.lon, miniRadarConfig.lat]});
+          miniradarAmenitiesTrans.jumpTo({center: [miniRadarConfig.lon, miniRadarConfig.lat]});
+          if (miniRadarConfig.zoom) {
+            miniradar.setZoom(miniRadarConfig.zoom);
+            miniEchoes.setZoom(miniRadarConfig.zoom);
+            miniradarAmenitiesTrans.setZoom(miniRadarConfig.zoom);
+          }
+        }
         if(systemSettings.LBar.locations.type == "extralocal"){
           lbarLocId = locationid + 1;
           if (lbarLocId >= systemSettings.LBar.locations.cities.length) {lbarLocId = 0}
           loadLbarLoc("update");
+        } else {
+          // Update sidebar with the active extra city's data
+          var eCity = systemSettings.extraCity.cities[nextLocId];
+          var eCC = weatherData.currentConditions.english.extraLoc[nextLocId];
+          $(".lbar-location").text(eCity.obsName);
+          $("#lbar .daypart-lbar .timestamp").html(eCity.locationName.toUpperCase() + ': &nbsp; <em>' + lBarData.cities[lbarLocId].forecast.dayPart.dayName + '</em>');
+          // Update mini radar city label
+          $(".radar-lbar .cities").empty();
+          $(".radar-lbar .cities-trans").empty();
+          systemSettings.LBar.radar.radarCities = [
+            {locationName: eCity.locationName, dotTopPos: "97", dotLeftPos: "235", nameTopMargin: "-32", nameLeftMargin: "-34"}
+          ];
+          createMiniradarCities();
+          if (eCC && !eCC.noReport) {
+            $(".obs-lbar .temperature").text(eCC.temperature);
+            getIcon($(".obs-lbar .icon"), eCC.icon, "ccObs", "small");
+            $(".obs-lbar").fadeIn(0);
+            $(".lbar-noreport").fadeOut(0);
+            lBarData.cities[lbarLocId].currentConditions = eCC;
+            systemSettings.LBar.locations.cities[lbarLocId].locationName = eCity.locationName;
+            systemSettings.LBar.locations.cities[lbarLocId].obsName = eCity.obsName;
+          } else {
+            $(".obs-lbar").fadeOut(0);
+            $(".lbar-noreport").fadeIn(0);
+          }
         }
         if (locationid != systemSettings.extraCity.cities.length) {
           headerRefresh()
@@ -2805,6 +2843,47 @@ function showSlides() {
     } else {
       locationChoice = "main"
     }
+    // Reposition mini radar and sidebar to match the current city in focus
+    if (locationChoice == "extra") {
+      var miniRadarConfig = systemSettings.extraCity.cities[locationid].radar;
+      var eCity = systemSettings.extraCity.cities[locationid];
+      var eCC = weatherData.currentConditions.english.extraLoc[locationid];
+      $(".lbar-location").text(eCity.obsName);
+      $("#lbar .daypart-lbar .timestamp").html(eCity.locationName.toUpperCase() + ': &nbsp; <em>' + lBarData.cities[lbarLocId].forecast.dayPart.dayName + '</em>');
+      // Update mini radar city label to match active city
+      $(".radar-lbar .cities").empty();
+      $(".radar-lbar .cities-trans").empty();
+      systemSettings.LBar.radar.radarCities = [
+        {locationName: eCity.locationName, dotTopPos: "97", dotLeftPos: "235", nameTopMargin: "-32", nameLeftMargin: "-34"}
+      ];
+      createMiniradarCities();
+      if (eCC && !eCC.noReport) {
+        $(".obs-lbar .temperature").text(eCC.temperature);
+        getIcon($(".obs-lbar .icon"), eCC.icon, "ccObs", "small");
+        $(".obs-lbar").fadeIn(0);
+        $(".lbar-noreport").fadeOut(0);
+        lBarData.cities[lbarLocId].currentConditions = eCC;
+        systemSettings.LBar.locations.cities[lbarLocId].locationName = eCity.locationName;
+        systemSettings.LBar.locations.cities[lbarLocId].obsName = eCity.obsName;
+      }
+    } else {
+      var miniRadarConfig = systemSettings.mainCity.radar;
+      // Restore main city sidebar
+      if (systemSettings.LBar.locations.type != "extralocal") {
+        lbarLocId = 0;
+        loadLbarLoc("update");
+      }
+    }
+    if (miniRadarConfig && miniRadarConfig.lat != "" && miniRadarConfig.lon != "") {
+      miniradar.jumpTo({center: [miniRadarConfig.lon, miniRadarConfig.lat]});
+      miniEchoes.jumpTo({center: [miniRadarConfig.lon, miniRadarConfig.lat]});
+      miniradarAmenitiesTrans.jumpTo({center: [miniRadarConfig.lon, miniRadarConfig.lat]});
+      if (miniRadarConfig.zoom) {
+        miniradar.setZoom(miniRadarConfig.zoom);
+        miniEchoes.setZoom(miniRadarConfig.zoom);
+        miniradarAmenitiesTrans.setZoom(miniRadarConfig.zoom);
+      }
+    }
   if (idx >= slideSettings.order[orderidx].slideLineup[gidx].slides.length) {
     //console.log(slideSettings.order[orderidx].slideLineup.length)
     idx = 0;
@@ -3011,7 +3090,7 @@ function manageDurations() {
       //makes no sense but it worked for me so... -jenson
       for (var eLoc = 0; eLoc < systemSettings.extraCity.cities.length; eLoc++) {
         var eSlides = []
-        if (weatherData.alerts.extraLoc[eLoc].pages == 0 || weatherData.alerts.extraLoc[eLoc].pages == undefined) {
+        if (!weatherData.alerts.extraLoc[eLoc] || weatherData.alerts.extraLoc[eLoc].pages == 0 || weatherData.alerts.extraLoc[eLoc].pages == undefined) {
           eSlides = extraSlides.noBulletin[Math.floor(Math.random() * extraSlides.noBulletin.length)]
         } else if (weatherData.alerts.extraLoc[eLoc].pages == 1) {
           eSlides = extraSlides.oneBulletin[Math.floor(Math.random() * extraSlides.noBulletin.length)]
